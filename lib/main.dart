@@ -1,4 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:mul_video_play/models/video_model.dart';
 import 'package:mul_video_play/video_screen.dart';
 
 var VideoList = [
@@ -25,8 +28,10 @@ var VideoList = [
   }
 ];
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -53,23 +58,49 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  DatabaseReference dbRef=FirebaseDatabase.instance.ref().child("Video");
+  List<Video> videoList=[];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
+      print(VideoList);
+  }
+
+  void getData(){
+    dbRef.onChildAdded.listen((data) {
+      VideoData videoData=VideoData.fromJson(data.snapshot.value as Map);
+      Video video = Video(key: data.snapshot.key,videoData: videoData);
+      videoList.add(video);
+      setState(() {});
+     });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Mul_vido"),
+        elevation: 0,
       ),
-      body: ListView(
-        children: VideoList.map((e) => GestureDetector(
-              onTap: ()=>Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context)=>VideoScreen(
-                  name:e["name"]!,
-                  videoUrl:e["videoUrl"]!,
-                ))
-              ),
-              child: Image.network(e["thumbnailUrl"]!),
-            )).toList(),
+      body: SafeArea(
+        child: ListView(
+          children: videoList.map((e) => GestureDetector(
+                onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context)=>VideoScreen(
+                    name:e.videoData!.name!,
+                    videoUrl:e.videoData!.mediaurl!,
+                  ))
+                );
+                },
+                child: Image.network(e.videoData!.thumbnail!),
+                // child: Text('1'),
+              )).toList(),
+        ),
       ),
     );
   }

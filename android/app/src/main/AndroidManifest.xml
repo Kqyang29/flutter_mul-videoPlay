@@ -1,11 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mul_video_play">
-    <uses-permission android:name="android.permission.INTERNET"/>
+    package="com.example.mul_video_play"
+        xmlns:tools="http://schemas.android.com/tools">
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
    <application
-       android:useCleartextTraffic="true"
         android:label="mul_video_play"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        tools:ignore="UnusedAttribute">
         <activity
             android:name=".MainActivity"
             android:exported="true"
